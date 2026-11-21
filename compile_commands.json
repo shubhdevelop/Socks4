@@ -6,27 +6,11 @@
       "-std=c99",
       "-Wall",
       "-Werror",
-      "-fsanitize=address",
-      "-g",
-      "main.c",
+      "socks4.c",
       "-o",
-      "main"
+      "socks4",
+      "-luring"
     ],
-    "file": "main.c"
-  },
-  {
-    "directory": "/home/shubham/Desktop/networking/socks",
-    "arguments": [
-      "gcc",
-      "-std=c99",
-      "-Wall",
-      "-Werror",
-      "-fsanitize=address",
-      "-g",
-      "client.c",
-      "-o",
-      "client"
-    ],
-    "file": "client.c"
+    "file": "socks4.c"
   }
 ]

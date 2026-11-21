@@ -1,0 +1,17 @@
+# Built binaries
+/socks4
+/socks4-debug
+/socks4-asan
+
+# Legacy names
+/socsk5
+/socks5
+/socks5-debug
+/sockss5
+
+# Generated / local tooling
+compile_commands.json
+
+# Python
+__pycache__/
+*.py[cod]

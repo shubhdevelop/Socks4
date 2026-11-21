@@ -2,39 +2,43 @@ CC = gcc
 CFLAGS = -std=c99 -Wall -Werror
 SANITIZE_FLAGS = -fsanitize=address -g
 DEBUG_FLAGS = -g -O0
+RELEASE_FLAGS = -O2 -DNDEBUG
 
-.PHONY: compile debug release run webapp tailscale-proxy clean
+SRC = socks4.c
+HDR = socks.h
 
-compile: socks5
+.PHONY: compile debug release run webapp tailscale-proxy clean compile_commands.json
 
-debug: socks5-debug
+compile: socks4
 
-%-debug: %.c Makefile
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEBUG_FLAGS) $< -o $@ $(LDFLAGS) $(LDLIBS)
+debug: socks4-debug
 
-socsk5: socks5.c
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(SANITIZE_FLAGS) $< -o $@ $(LDFLAGS) $(LDLIBS)
+socks4 socks4-debug socks4-asan: LDLIBS += -luring
 
-socks5 socks5-debug: LDLIBS += -luring
+socks4: $(SRC) $(HDR) Makefile
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(SRC) -o $@ $(LDFLAGS) $(LDLIBS)
 
-socks5: socks5.c socks.h Makefile
-	$(CC) $(CPPFLAGS) $(CFLAGS) socks5.c -o $@ $(LDFLAGS) $(LDLIBS)
+socks4-debug: $(SRC) $(HDR) Makefile
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEBUG_FLAGS) $(SRC) -o $@ $(LDFLAGS) $(LDLIBS)
 
-tailscale-proxy: socks5
-	./socks5 "$$(tailscale ip -4)"
+socks4-asan: $(SRC) $(HDR) Makefile
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(SANITIZE_FLAGS) $(SRC) -o $@ $(LDFLAGS) $(LDLIBS)
 
-release:
-	$(CC) $(CPPFLAGS) $(CFLAGS) socks5.c -o sockss5 $(LDFLAGS) $(LDLIBS) -luring
+release: $(SRC) $(HDR) Makefile
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(RELEASE_FLAGS) $(SRC) -o socks4 $(LDFLAGS) $(LDLIBS)
 
-# Generate clangd entries for both programs (requires Python 3).
+tailscale-proxy: socks4
+	./socks4 "$$(tailscale ip -4)"
+
+# Generate clangd entries (requires Python 3).
 compile_commands.json: Makefile
-	python3 -c 'import json, os, sys; print(json.dumps([{"directory": os.getcwd(), "arguments": sys.argv[1:] + [name + ".c", "-o", name], "file": name + ".c"} for name in ("main", "client")], indent=2))' $(CC) $(CPPFLAGS) $(CFLAGS) $(SANITIZE_FLAGS) > $@
+	python3 -c 'import json, os, sys; print(json.dumps([{"directory": os.getcwd(), "arguments": sys.argv[1:] + ["socks4.c", "-o", "socks4", "-luring"], "file": "socks4.c"}], indent=2))' $(CC) $(CPPFLAGS) $(CFLAGS) > $@
 
-run: socsk5
-	./socks5
+run: socks4
+	./socks4
 
 webapp:
 	python3 webapp.py
 
 clean:
-	rm -f socsk5 socks5-debug
+	rm -f socks4 socks4-debug socks4-asan socsk5 socks5 socks5-debug sockss5
