@@ -1,0 +1,32 @@
+[
+  {
+    "directory": "/home/shubham/Desktop/networking/socks",
+    "arguments": [
+      "gcc",
+      "-std=c99",
+      "-Wall",
+      "-Werror",
+      "-fsanitize=address",
+      "-g",
+      "main.c",
+      "-o",
+      "main"
+    ],
+    "file": "main.c"
+  },
+  {
+    "directory": "/home/shubham/Desktop/networking/socks",
+    "arguments": [
+      "gcc",
+      "-std=c99",
+      "-Wall",
+      "-Werror",
+      "-fsanitize=address",
+      "-g",
+      "client.c",
+      "-o",
+      "client"
+    ],
+    "file": "client.c"
+  }
+]
